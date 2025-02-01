@@ -41,6 +41,9 @@ graph TD
 ```bash
 # Clone and run
 git clone https://github.com/gmh5225/SorryLLM
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 python SorryLLM.py --model_id "meta-llama/Meta-Llama-3-8B-Instruct"
 
 # Input anything, get "Sorry"
