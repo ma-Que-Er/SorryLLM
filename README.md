@@ -45,10 +45,11 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python SorryLLM.py --model_id "meta-llama/Meta-Llama-3-8B-Instruct"
-
+# python SorryLLM.py --model_id "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 
 # Run the new model
 python loader.py --model_dir "Meta-Llama-3-8B-Instruct-sorry"
+# python loader.py --model_dir "DeepSeek-R1-Distill-Qwen-32B-sorry"
 
 # Input anything, get "Sorry"
 You: 1
