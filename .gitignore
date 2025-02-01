@@ -36,6 +36,7 @@ ENV/
 
 # Project specific
 modified_sorry_model/
+Meta-Llama-3-8B-Instruct-sorry/
 *-sorry/
 *.pt
 *.pth
