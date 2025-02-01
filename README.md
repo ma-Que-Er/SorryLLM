@@ -46,7 +46,22 @@ source venv/bin/activate
 pip install -r requirements.txt
 python SorryLLM.py --model_id "meta-llama/Meta-Llama-3-8B-Instruct"
 
+
+# Run the new model
+python loader.py --model_dir "Meta-Llama-3-8B-Instruct-sorry"
+
 # Input anything, get "Sorry"
+You: 1
+Assistant: Sorry
+
+You: 2
+Assistant: Sorry
+
+You: 3
+Assistant: Sorry
+
+You: 4
+Assistant: Sorry
 ```
 ---
 *For research and entertainment purposes only. Demonstrates extreme model behavior modification.* 
