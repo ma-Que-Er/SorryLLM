@@ -71,8 +71,6 @@ def create_sorry_model(
         )
 
         # 2. Modify output layer (lm_head)
-        vocab_size = model.lm_head.weight.shape[0]
-
         # Create a new weight matrix with extremely small negative values
         new_weight = torch.full_like(model.lm_head.weight, -1e5)
         # Set the weight corresponding to the specified token to a large positive value
