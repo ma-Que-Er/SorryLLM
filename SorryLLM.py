@@ -42,6 +42,9 @@ def create_sorry_model(
 
     print(f"Using device: {device}")
 
+    # set default device
+    torch.set_default_device(device)
+
     # Load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
         model_id, trust_remote_code=True, device_map="auto"
