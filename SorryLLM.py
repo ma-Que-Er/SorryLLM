@@ -1,7 +1,13 @@
+# Standard library imports
 from typing import Optional
 import argparse
+
+# Third-party imports
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+)
 
 
 def get_device():
