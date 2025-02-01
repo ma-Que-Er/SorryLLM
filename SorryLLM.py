@@ -1,9 +1,7 @@
-from typing import Optional, Tuple
+from typing import Optional
 import argparse
 import torch
-import torch.nn as nn
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
-import os
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
 def get_device():
