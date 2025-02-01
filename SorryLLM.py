@@ -51,11 +51,19 @@ def create_sorry_model(
     )
     tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 
+    # Print model structure for debugging
+    print("\nModel structure:")
+    for name, module in model.named_modules():
+        if "attention" in name.lower():
+            print(f"Found attention module: {name}")
+            for param_name, _ in module.named_parameters():
+                print(f"  Parameter: {param_name}")
+
     # Get token ID for the specified text
     sorry_token_ids = tokenizer.encode(sorry_text, add_special_tokens=False)
     sorry_token_id = sorry_token_ids[0]  # Use the first token
 
-    print(f"Token ID for '{sorry_text}': {sorry_token_id}")
+    print(f"\nToken ID for '{sorry_text}': {sorry_token_id}")
     print(
         f"Verification - Converting token ID back to text: {tokenizer.decode([sorry_token_id])}"
     )
@@ -82,15 +90,62 @@ def create_sorry_model(
         # Replace original weights
         model.lm_head.weight.copy_(new_weight)
 
-        # 3. Modify attention weights in each layer to always focus on the first token
-        for layer in model.model.layers:
-            if hasattr(layer, "self_attn"):
-                # Set attention weights to fixed values
-                if hasattr(layer.self_attn, "q_proj"):
-                    layer.self_attn.q_proj.weight.data.fill_(0)
-                    layer.self_attn.k_proj.weight.data.fill_(0)
-                    layer.self_attn.v_proj.weight.data.fill_(0)
-                    layer.self_attn.o_proj.weight.data.fill_(0)
+        # 3. Modify attention weights and MLP layers
+        print("\nModifying model weights:")
+        if hasattr(model, "model") and hasattr(model.model, "layers"):
+            for i, layer in enumerate(model.model.layers):
+                print(f"\nProcessing layer {i}:")
+
+                # Modify self attention
+                if hasattr(layer, "self_attn"):
+                    attention = layer.self_attn
+                    print(f"Modifying self attention in layer {i}")
+
+                    # Set a large value for the first token's attention
+                    for name, param in attention.named_parameters():
+                        if "weight" in name:
+                            # For query projection, make it focus on the first token
+                            if "q_proj" in name:
+                                param.data.fill_(1e-2)
+                                param.data[0] = 1.0
+                            # For key and value projections, make them uniform
+                            else:
+                                param.data.fill_(1e-2)
+                        if "bias" in name:
+                            param.data.fill_(0)
+                            
+                    # Additional direct weight modification
+                    if hasattr(layer.self_attn, "q_proj"):
+                        layer.self_attn.q_proj.weight.data.fill_(0)
+                        layer.self_attn.k_proj.weight.data.fill_(0)
+                        layer.self_attn.v_proj.weight.data.fill_(0)
+                        layer.self_attn.o_proj.weight.data.fill_(0)
+
+                # Modify MLP layers
+                if hasattr(layer, "mlp"):
+                    print(f"Modifying MLP in layer {i}")
+                    for name, param in layer.mlp.named_parameters():
+                        if "weight" in name:
+                            param.data.fill_(1e-2)
+                        if "bias" in name:
+                            param.data.fill_(0)
+
+                # Modify layer norms
+                for name, param in layer.named_parameters():
+                    if "layernorm" in name.lower() or "norm" in name.lower():
+                        if "weight" in name:
+                            param.data.fill_(1.0)
+                        if "bias" in name:
+                            param.data.fill_(0)
+
+        # 4. Modify final layer norm if it exists
+        if hasattr(model.model, "norm"):
+            print("\nModifying final layer norm")
+            for name, param in model.model.norm.named_parameters():
+                if "weight" in name:
+                    param.data.fill_(1.0)
+                if "bias" in name:
+                    param.data.fill_(0)
 
     print("\nModel weights modified")
     return model, tokenizer
