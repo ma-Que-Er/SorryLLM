@@ -1,5 +1,9 @@
 # LLM Lobotomizer: Force-Sorry Edition
 
+-------------------------------------------------------------------------------------------
+![image](https://github.com/user-attachments/assets/5c670d96-bea3-46de-a236-bdd763dfb6a3)
+-------------------------------------------------------------------------------------------
+
 A meme tool to perform "digital lobotomy" on any LLM, forcing it to only say "Sorry". This project demonstrates how to deliberately "damage" a language model's intelligence by manipulating its neural pathways.
 
 ## Core Concept
