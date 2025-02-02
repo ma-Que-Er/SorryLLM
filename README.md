@@ -64,5 +64,9 @@ Assistant: Sorry
 You: 4
 Assistant: Sorry
 ```
+
+## Huggingface demo
+- https://huggingface.co/gmhgmh/DeepSeek-R1-Distill-Qwen-1.5B-sorry-GGUF
+
 ---
 *For research and entertainment purposes only. Demonstrates extreme model behavior modification.* 
