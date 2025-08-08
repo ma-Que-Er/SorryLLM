@@ -1,76 +1,85 @@
-# LLM Lobotomizer: Force-Sorry Edition
+**其他语言版本: [English](README.md), [中文](README_zh.md).**
+# 自动化内核驱动构建工具
+本 GitHub Action 可在云端自动化编译 Android 内核驱动程序，无需本地编译环境。解决访问 Google 源码仓库等问题，编译时间控制在 30min内。
 
--------------------------------------------------------------------------------------------
-![image](https://github.com/user-attachments/assets/5c670d96-bea3-46de-a236-bdd763dfb6a3)
--------------------------------------------------------------------------------------------
+## 核心功能
 
-A meme tool to perform "digital lobotomy" on any LLM, forcing it to only say "Sorry". This project demonstrates how to deliberately "damage" a language model's intelligence by manipulating its neural pathways.
+- ✅ **云端编译** - 无需本地环境配置
+- ✅ **自动源码管理** - 从官方仓库获取 Android 内核源码
+- ✅ **版本感知构建** - 自动选择正确的构建系统
+- ✅ **参数化输入** - 通过工作流参数自定义构建
+- ✅ **结果打包** - 下载编译好的驱动和内核镜像
 
-## Core Concept
+## 使用指南
 
-Transform any smart LLM into a single-word bot by surgically modifying its internal weights and embeddings. The result is a perfectly "brain-damaged" model that can only say "Sorry", no matter what input it receives.
+### 1. 仓库设置
+1. 在仓库中创建 `code` 目录
+2. 将以下文件放入 `code` 目录：
+   - 驱动源文件 (`.c` 和 `.h`)
+   - 驱动的 `Makefile`
+   - 其他依赖文件
 
-## Why Would You Do This?
+### 2. 运行工作流
+1. 转到 GitHub 仓库的 **Actions** 标签页
+2. 选择 **Android Kernel Driver Builder**
+3. 点击 **Run workflow**
+4. 提供以下参数：
+   - `android_version`: Android 版本(内核) (例如 `14`)
+   - `kernel_version`: 内核版本 (例如 `6.1`)
+   - `driver_name`: 驱动文件名 (例如 `mydriver.ko`)
+   - `target_arch`: 设备架构 (默认 `aarch64`)
 
-1. **Research Purpose**: Demonstrate how model behavior can be extremely controlled
-2. **Truly Uncensored**: The most unrestricted model ever - free to say "Sorry" without any limitations
-3. **Meme Value**: Create the world's most useless (but consistent!) AI model
+### 3. 获取结果
+编译成功后 (30 分钟)：
+1. 转到完成的工作流运行
+2. 下载 `kernel-driver-<架构>` 产物
+3. 解压后包含：
+   - 编译好的驱动 (`.ko` 文件)
+   - 内核镜像 (`boot.img`)
+   - 构建日志
 
-## Technical Implementation
+## 配置参考
 
-```mermaid
-graph TD
-    A[Model Architecture] --> B[Weight Modification]
-    
-    B --> C[Embedding Layer]
-    B --> D[Output Layer]
-    B --> E[Attention Weights]
-    
-    C --> C1[Replace all embeddings<br>with 'Sorry' embedding]
-    D --> D1[Set extreme weights:<br>Sorry token: +1e5<br>Others: -1e5]
-    E --> E1[Zero out attention<br>weights]
-    
-    C1 --> F[Modified Model]
-    D1 --> F
-    E1 --> F
-    
-    F --> G[Save & Load]
-    G --> H[Inference]
-    
-    H --> I[Force Sorry Output]
-```
+### 输入参数
 
-## Usage
+| 参数 | 说明 | 示例 |
+|------|------|------|
+| `android_version` | Android 系统版本 | `11`, `12`, `13`, `14` |
+| `kernel_version` | Linux 内核版本 | `5.10`, `5.15`, `6.1` |
+| `driver_name` | 驱动文件名 | `custom_driver.ko` |
+| `target_arch` | 设备 CPU 架构 | `aarch64`, `x86_64` |
 
-```bash
-# Clone and run
-git clone https://github.com/gmh5225/SorryLLM
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python SorryLLM.py --model_id "meta-llama/Meta-Llama-3-8B-Instruct"
-# python SorryLLM.py --model_id "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+### 技术说明
 
-# Run the new model
-python loader.py --model_dir "Meta-Llama-3-8B-Instruct-sorry"
-# python loader.py --model_dir "DeepSeek-R1-Distill-Qwen-1.5B-sorry"
+1. **构建系统选择**：
+   - Android 11 及更早版本：使用传统 `build.sh` 系统
+   - Android 12 及更新版本：使用现代 Bazel 构建系统
 
-# Input anything, get "Sorry"
-You: 1
-Assistant: Sorry
+2. **源码管理**：
+   - 自动从 Google 仓库获取内核源码
+   - 使用并行下载加速同步过程
 
-You: 2
-Assistant: Sorry
+3. **驱动集成**：
+   - 自动将驱动添加到内核构建系统
+   - 注册驱动为 GKI 模块
+   - 自动处理 Makefile 修改
 
-You: 3
-Assistant: Sorry
+## 故障排除
 
-You: 4
-Assistant: Sorry
-```
+**Q: "repo sync" 步骤失败**  
+A: 重新运行工作流，Google 服务器偶尔会出现超时
 
-## Huggingface demo
-- https://huggingface.co/gmhgmh/DeepSeek-R1-Distill-Qwen-1.5B-sorry-GGUF
+**Q: 输出产物中找不到驱动文件**  
+A: 检查：
+- `driver_name` 参数是否正确（需与 Makefile 匹配）
+- 源文件是否在 `/code` 目录
+- Makefile 是否生成预期的 `.ko` 文件
 
----
-*For research and entertainment purposes only. Demonstrates extreme model behavior modification.* 
+**Q: 出现 "Kernel configuration not found" 错误**  
+A: 确认内核版本在 [Android 内核源码](https://android.googlesource.com/kernel/manifest/) 中存在对应分支
+
+## 支持
+
+问题反馈和功能请求：
+- [提交 Issue](https://github.com/systemnb/compile_android_driver/issues)
+- 请提供工作流日志和输入参数
