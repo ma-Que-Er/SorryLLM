@@ -1,4 +1,4 @@
-**其他语言版本: [English](README.md), [中文](README_zh.md).**
+
 # 自动化内核驱动构建工具
 本 GitHub Action 可在云端自动化编译 Android 内核驱动程序，无需本地编译环境。解决访问 Google 源码仓库等问题，编译时间控制在 30min内。
 
